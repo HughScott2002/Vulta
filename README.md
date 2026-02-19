@@ -1,10 +1,18 @@
-# Vulta
+<p align="center">
+  <img src="Vulta_Logo.svg" alt="Vulta" width="200" />
+</p>
 
-A minimal desktop app for music producers to capture, organize, and track creative ideas.
+<h1 align="center">Vulta</h1>
 
-Built with Tauri v2, React, TypeScript, and Rust.
+<p align="center">
+  A minimal desktop app for music producers to capture, organize, and track creative ideas.<br/>
+  Built with Tauri v2, React, TypeScript, and Rust.
+</p>
 
 ---
+
+<!-- Add a screenshot here later -->
+<!-- <p align="center"><img src=".github/screenshot.png" alt="Vulta screenshot" width="700" /></p> -->
 
 ## Features
 
@@ -68,4 +76,4 @@ Settings (output directory, watch folders, yearly goal) persist in your OS app d
 
 ## License
 
-MIT
+[MIT](LICENSE)
