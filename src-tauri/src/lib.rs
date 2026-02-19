@@ -22,6 +22,7 @@ struct Settings {
     base_dir: Option<String>,
     watch_folders: Option<Vec<String>>,
     yearly_goal: Option<u32>,
+    onboarding_completed: Option<bool>,
 }
 
 #[command]
@@ -156,6 +157,35 @@ fn get_default_base_dir() -> Result<String, String> {
         .or_else(|| dirs::home_dir().map(|h| h.join("Music")))
         .ok_or_else(|| "Cannot determine Music directory".to_string())?;
     Ok(base.to_string_lossy().to_string())
+}
+
+#[command]
+fn load_onboarding_completed() -> Result<bool, String> {
+    let path = settings_path()?;
+    if !path.exists() {
+        return Ok(false);
+    }
+    let data =
+        fs::read_to_string(&path).map_err(|e| format!("Failed to read settings: {}", e))?;
+    let settings: Settings =
+        serde_json::from_str(&data).map_err(|e| format!("Failed to parse settings: {}", e))?;
+    Ok(settings.onboarding_completed.unwrap_or(false))
+}
+
+#[command]
+fn save_onboarding_completed(completed: bool) -> Result<(), String> {
+    let path = settings_path()?;
+    let mut settings: Settings = if path.exists() {
+        let data = fs::read_to_string(&path).unwrap_or_default();
+        serde_json::from_str(&data).unwrap_or_default()
+    } else {
+        Settings::default()
+    };
+    settings.onboarding_completed = Some(completed);
+    let data = serde_json::to_string_pretty(&settings)
+        .map_err(|e| format!("Failed to serialize: {}", e))?;
+    fs::write(&path, data).map_err(|e| format!("Failed to write settings: {}", e))?;
+    Ok(())
 }
 
 // ─── File move ───────────────────────────────────────────────────────
@@ -403,6 +433,8 @@ pub fn run() {
             load_yearly_goal,
             save_yearly_goal,
             get_yearly_total,
+            load_onboarding_completed,
+            save_onboarding_completed,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -745,3 +745,227 @@ html, body, #root {
   from { opacity: 1; }
   to   { opacity: 0; transform: translateY(-8px); }
 }
+
+/* ─── Help tab ────────────────────────────────────────────────────── */
+
+.help-tab {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.help-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.help-title-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.help-subtitle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.help-sections {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.help-section {
+  background: var(--bg-elevated);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: border-color 0.2s var(--ease);
+}
+
+.help-section-open {
+  border-color: var(--border-hover);
+}
+
+.help-section-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: left;
+  transition: background 0.15s var(--ease);
+}
+
+.help-section-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.help-section-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.help-section-title {
+  flex: 1;
+}
+
+.help-chevron {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform 0.2s var(--ease);
+}
+
+.help-chevron-open {
+  transform: rotate(180deg);
+}
+
+.help-section-body {
+  padding: 0 14px 12px;
+}
+
+.help-section-body p {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.help-section-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Onboarding overlay ──────────────────────────────────────────── */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+}
+
+.onboarding-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.onboarding-spotlight-ring {
+  position: absolute;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 20px var(--primary-glow), 0 0 40px rgba(50, 204, 42, 0.1);
+  pointer-events: none;
+  transition: all 0.3s var(--ease);
+}
+
+.onboarding-tooltip {
+  position: absolute;
+  z-index: 201;
+  width: 280px;
+  padding: 16px;
+  background: var(--bg-elevated);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  animation: tooltip-appear 0.25s ease-out;
+}
+
+@keyframes tooltip-appear {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.onboarding-step-indicator {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.onboarding-tooltip-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.onboarding-tooltip-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.onboarding-tooltip-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.onboarding-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.onboarding-btn {
+  padding: 5px 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+  font-family: inherit;
+}
+
+.onboarding-btn-skip {
+  background: none;
+  color: var(--text-muted);
+  border-color: transparent;
+}
+
+.onboarding-btn-skip:hover {
+  color: var(--text-secondary);
+}
+
+.onboarding-btn-back {
+  background: var(--bg-inset);
+  color: var(--text-secondary);
+}
+
+.onboarding-btn-back:hover {
+  border-color: var(--border-hover);
+}
+
+.onboarding-btn-next {
+  background: var(--primary);
+  color: #111;
+  border-color: var(--primary);
+  font-weight: 600;
+}
+
+.onboarding-btn-next:hover {
+  background: var(--primary-dim);
+  border-color: var(--primary-dim);
+}

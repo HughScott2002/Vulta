@@ -6,7 +6,7 @@ import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
 import "./App.css";
 
 type Zone = "instrumental" | "lyrics";
-type Tab = "home" | "organize";
+type Tab = "home" | "organize" | "help";
 
 interface Toast {
   id: number;
@@ -31,6 +31,129 @@ interface AudioFile {
 }
 
 type TransferMode = "copy" | "move";
+
+// ─── Help tab content ───────────────────────────────────────────────
+
+interface HelpSection {
+  id: string;
+  title: string;
+  icon: string;
+  content: string[];
+}
+
+const HELP_SECTIONS: HelpSection[] = [
+  {
+    id: "getting-started",
+    title: "Getting Started",
+    icon: "\u{1F3AC}",
+    content: [
+      "Vulta organizes your daily creative output into a date-based folder structure. Every time you drop or send a file, it goes into an \"Idea Gen\" folder for today's date.",
+      "Use the folder button in the header to choose where Vulta saves files. By default it uses your Music folder.",
+    ],
+  },
+  {
+    id: "drop-zones",
+    title: "Drop Zones",
+    icon: "\u{1F3AF}",
+    content: [
+      "Switch to the Organize tab to see two drop zones: Instrumentals/Beats and Lyrics & Melody. Drag audio files from your file manager onto the correct zone.",
+      "Files are moved into today's dated subfolder automatically. If a file with the same name already exists, Vulta appends a number (_1, _2, etc.).",
+    ],
+  },
+  {
+    id: "mixdowns",
+    title: "Mixdowns",
+    icon: "\u{1F3B5}",
+    content: [
+      "The Mixdowns panel on the Home tab lets you watch folders for new audio files. Click the + button to add a watch folder, then use the Inst/Lyr buttons to quickly send files to the right zone.",
+      "Toggle between Copy and Move mode with the mode button. Copy leaves the original in place; Move removes it after transfer.",
+    ],
+  },
+  {
+    id: "yearly-goal",
+    title: "Yearly Goal & Heatmap",
+    icon: "\u{1F525}",
+    content: [
+      "Set a yearly goal by clicking the goal number on the Home tab. The heatmap shows your last 30 days of activity \u2014 darker green means more ideas that day.",
+      "Your streak counter tracks consecutive days with at least one idea. The progress card shows how many ideas remain to hit your annual target.",
+    ],
+  },
+  {
+    id: "settings",
+    title: "Settings",
+    icon: "\u2699\uFE0F",
+    content: [
+      "Click the folder path in the header to change the output directory. Enable \"Launch on startup\" on the Home tab to have Vulta open when your computer starts.",
+      "Watch folders for the Mixdowns panel are saved between sessions. Remove a watch folder by clicking the \u00D7 on its chip.",
+    ],
+  },
+];
+
+// ─── Onboarding step definitions ────────────────────────────────────
+
+interface OnboardingStep {
+  id: string;
+  title: string;
+  description: string;
+  targetSelector: string;
+  targetTab?: Tab;
+  position: "top" | "bottom" | "left" | "right";
+}
+
+const ONBOARDING_STEPS: OnboardingStep[] = [
+  {
+    id: "welcome",
+    title: "Welcome to Vulta",
+    description:
+      "Vulta organizes your daily creative output into date-based folders. Let\u2019s take a quick tour.",
+    targetSelector: ".app-header h1",
+    position: "bottom",
+  },
+  {
+    id: "home-overview",
+    title: "Home Tab",
+    description:
+      "This is your dashboard. See today\u2019s ideas count, your streak, heatmap, and yearly progress at a glance.",
+    targetSelector: ".home-left",
+    targetTab: "home",
+    position: "right",
+  },
+  {
+    id: "mixdowns",
+    title: "Mixdowns Panel",
+    description:
+      "Watch folders for new audio files and quickly sort them into the right zone. Add folders with the + button.",
+    targetSelector: ".mixdowns-section",
+    targetTab: "home",
+    position: "left",
+  },
+  {
+    id: "organize",
+    title: "Drop Zones",
+    description:
+      "Drag files from your file manager onto Instrumentals or Lyrics & Melody to organize them instantly.",
+    targetSelector: ".zones",
+    targetTab: "organize",
+    position: "top",
+  },
+  {
+    id: "yearly-goal",
+    title: "Yearly Goal",
+    description:
+      "Click the goal number to set a target. The heatmap and progress bar track how you\u2019re doing.",
+    targetSelector: ".stats-grid",
+    targetTab: "home",
+    position: "bottom",
+  },
+  {
+    id: "done",
+    title: "You\u2019re all set!",
+    description:
+      "Start dropping files to build your creative streak. You can always revisit the Help tab for guidance.",
+    targetSelector: ".tab-nav",
+    position: "bottom",
+  },
+];
 
 // ─── Heatmap component ──────────────────────────────────────────────
 
@@ -483,12 +606,217 @@ function OrganizeTab({
   );
 }
 
+// ─── Help tab ────────────────────────────────────────────────────────
+
+function HelpTab() {
+  const [expanded, setExpanded] = useState<Set<string>>(new Set(["getting-started"]));
+
+  const toggle = (id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  return (
+    <div className="help-tab">
+      <div className="help-header">
+        <span className="help-title-text">User Guide</span>
+        <span className="help-subtitle">Learn how to use every feature in Vulta</span>
+      </div>
+      <div className="help-sections">
+        {HELP_SECTIONS.map((section) => {
+          const isOpen = expanded.has(section.id);
+          return (
+            <div
+              key={section.id}
+              className={`help-section ${isOpen ? "help-section-open" : ""}`}
+            >
+              <button className="help-section-header" onClick={() => toggle(section.id)}>
+                <span className="help-section-icon">{section.icon}</span>
+                <span className="help-section-title">{section.title}</span>
+                <span className={`help-chevron ${isOpen ? "help-chevron-open" : ""}`}>
+                  &#9662;
+                </span>
+              </button>
+              {isOpen && (
+                <div className="help-section-body">
+                  {section.content.map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Onboarding overlay (coach marks) ───────────────────────────────
+
+function OnboardingOverlay({
+  onComplete,
+  setTab,
+}: {
+  onComplete: () => void;
+  setTab: (tab: Tab) => void;
+}) {
+  const [step, setStep] = useState(0);
+  const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null);
+
+  const current = ONBOARDING_STEPS[step];
+  const isFirst = step === 0;
+  const isLast = step === ONBOARDING_STEPS.length - 1;
+
+  useEffect(() => {
+    if (current.targetTab) {
+      setTab(current.targetTab);
+    }
+
+    const timer = setTimeout(() => {
+      const el = document.querySelector(current.targetSelector);
+      if (el) {
+        setSpotlightRect(el.getBoundingClientRect());
+      } else {
+        setSpotlightRect(null);
+      }
+    }, 120);
+
+    return () => clearTimeout(timer);
+  }, [step, current, setTab]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const el = document.querySelector(current.targetSelector);
+      if (el) setSpotlightRect(el.getBoundingClientRect());
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [current]);
+
+  const next = () => {
+    if (isLast) onComplete();
+    else setStep(step + 1);
+  };
+
+  const back = () => {
+    if (!isFirst) setStep(step - 1);
+  };
+
+  const getTooltipStyle = (): React.CSSProperties => {
+    if (!spotlightRect) {
+      return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+    }
+
+    const pad = 16;
+    const pos = current.position;
+
+    if (pos === "bottom") {
+      return {
+        top: spotlightRect.bottom + pad,
+        left: spotlightRect.left + spotlightRect.width / 2,
+        transform: "translateX(-50%)",
+      };
+    }
+    if (pos === "top") {
+      return {
+        bottom: window.innerHeight - spotlightRect.top + pad,
+        left: spotlightRect.left + spotlightRect.width / 2,
+        transform: "translateX(-50%)",
+      };
+    }
+    if (pos === "left") {
+      return {
+        top: spotlightRect.top + spotlightRect.height / 2,
+        right: window.innerWidth - spotlightRect.left + pad,
+        transform: "translateY(-50%)",
+      };
+    }
+    return {
+      top: spotlightRect.top + spotlightRect.height / 2,
+      left: spotlightRect.right + pad,
+      transform: "translateY(-50%)",
+    };
+  };
+
+  return (
+    <div className="onboarding-overlay">
+      <svg className="onboarding-backdrop">
+        <defs>
+          <mask id="spotlight-mask">
+            <rect x="0" y="0" width="100%" height="100%" fill="white" />
+            {spotlightRect && (
+              <rect
+                x={spotlightRect.left - 8}
+                y={spotlightRect.top - 8}
+                width={spotlightRect.width + 16}
+                height={spotlightRect.height + 16}
+                rx="12"
+                ry="12"
+                fill="black"
+              />
+            )}
+          </mask>
+        </defs>
+        <rect
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          fill="rgba(0, 0, 0, 0.7)"
+          mask="url(#spotlight-mask)"
+        />
+      </svg>
+
+      {spotlightRect && (
+        <div
+          className="onboarding-spotlight-ring"
+          style={{
+            top: spotlightRect.top - 8,
+            left: spotlightRect.left - 8,
+            width: spotlightRect.width + 16,
+            height: spotlightRect.height + 16,
+          }}
+        />
+      )}
+
+      <div className="onboarding-tooltip" style={getTooltipStyle()}>
+        <div className="onboarding-step-indicator">
+          {step + 1} / {ONBOARDING_STEPS.length}
+        </div>
+        <div className="onboarding-tooltip-title">{current.title}</div>
+        <div className="onboarding-tooltip-desc">{current.description}</div>
+        <div className="onboarding-tooltip-actions">
+          <button className="onboarding-btn onboarding-btn-skip" onClick={onComplete}>
+            Skip
+          </button>
+          <div className="onboarding-btn-group">
+            {!isFirst && (
+              <button className="onboarding-btn onboarding-btn-back" onClick={back}>
+                Back
+              </button>
+            )}
+            <button className="onboarding-btn onboarding-btn-next" onClick={next}>
+              {isLast ? "Done" : "Next"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main App ────────────────────────────────────────────────────────
 
 function App() {
   const [tab, setTab] = useState<Tab>("home");
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [baseDir, setBaseDir] = useState<string>("");
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const toastId = useRef(0);
   const baseDirRef = useRef(baseDir);
   baseDirRef.current = baseDir;
@@ -499,6 +827,20 @@ function App() {
       .catch(() => {
         invoke<string>("get_default_base_dir").then(setBaseDir).catch(() => {});
       });
+  }, []);
+
+  useEffect(() => {
+    invoke<boolean>("load_onboarding_completed")
+      .then((completed) => {
+        if (!completed) setShowOnboarding(true);
+      })
+      .catch(() => {});
+  }, []);
+
+  const completeOnboarding = useCallback(() => {
+    setShowOnboarding(false);
+    invoke("save_onboarding_completed", { completed: true }).catch(() => {});
+    setTab("home");
   }, []);
 
   useEffect(() => {
@@ -552,14 +894,22 @@ function App() {
           >
             Organize
           </button>
+          <button
+            className={`tab-btn ${tab === "help" ? "tab-active" : ""}`}
+            onClick={() => setTab("help")}
+          >
+            Help
+          </button>
         </nav>
       </header>
 
       <main className="tab-content">
         {tab === "home" ? (
           <HomeTab baseDir={baseDir} addToast={addToast} />
-        ) : (
+        ) : tab === "organize" ? (
           <OrganizeTab addToast={addToast} baseDirRef={baseDirRef} />
+        ) : (
+          <HelpTab />
         )}
       </main>
 
@@ -570,6 +920,10 @@ function App() {
           </div>
         ))}
       </div>
+
+      {showOnboarding && (
+        <OnboardingOverlay onComplete={completeOnboarding} setTab={setTab} />
+      )}
     </div>
   );
 }
