@@ -2,8 +2,6 @@
   <img src="Vulta_Logo.svg" alt="Vulta" width="200" />
 </p>
 
-<h1 align="center">Vulta</h1>
-
 <p align="center">
   A minimal desktop app for music producers to capture, organize, and track creative ideas.<br/>
   Built with Tauri v2, React, TypeScript, and Rust.
