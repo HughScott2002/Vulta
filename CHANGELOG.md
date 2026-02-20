@@ -5,6 +5,17 @@ All notable changes to Vulta will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-02-20
+
+### Added
+
+- **OTA auto-updates** — app checks GitHub Releases on launch and shows an update bar when a new version is available; one-click download, install, and relaunch
+- Signing keys and updater plugin integrated for secure update verification
+
+### Changed
+
+- `.gitignore` updated to exclude signing keys
+
 ## [0.2.0] - 2026-02-19
 
 ### Added

@@ -421,6 +421,12 @@ pub fn run() {
             MacosLauncher::LaunchAgent,
             None,
         ))
+        .setup(|app| {
+            #[cfg(desktop)]
+            app.handle()
+                .plugin(tauri_plugin_updater::Builder::new().build())?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             move_file,
             get_default_base_dir,

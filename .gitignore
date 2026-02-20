@@ -26,5 +26,10 @@ dist-ssr
 # Rust build artifacts
 src-tauri/target/
 
+# Signing keys — NEVER commit these
+*.key
+*.key.pub
+~/.tauri/
+
 # Windows artifact
 nul

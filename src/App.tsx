@@ -3,6 +3,8 @@ import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
+import { check, type Update } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 import "./App.css";
 
 type Zone = "instrumental" | "lyrics";
@@ -810,6 +812,48 @@ function OnboardingOverlay({
   );
 }
 
+// ─── Update bar ─────────────────────────────────────────────────────
+
+function UpdateBar({
+  update,
+  onDismiss,
+}: {
+  update: Update;
+  onDismiss: () => void;
+}) {
+  const [updating, setUpdating] = useState(false);
+
+  const doUpdate = async () => {
+    setUpdating(true);
+    try {
+      await update.downloadAndInstall();
+      await relaunch();
+    } catch {
+      setUpdating(false);
+    }
+  };
+
+  return (
+    <div className="update-bar">
+      <span className="update-bar-text">
+        {updating
+          ? "Downloading update\u2026"
+          : `Update v${update.version} available`}
+      </span>
+      {!updating && (
+        <div className="update-bar-actions">
+          <button className="update-bar-btn" onClick={doUpdate}>
+            Update Now
+          </button>
+          <button className="update-bar-dismiss" onClick={onDismiss}>
+            &times;
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main App ────────────────────────────────────────────────────────
 
 function App() {
@@ -817,6 +861,7 @@ function App() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [baseDir, setBaseDir] = useState<string>("");
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [availableUpdate, setAvailableUpdate] = useState<Update | null>(null);
   const toastId = useRef(0);
   const baseDirRef = useRef(baseDir);
   baseDirRef.current = baseDir;
@@ -833,6 +878,14 @@ function App() {
     invoke<boolean>("load_onboarding_completed")
       .then((completed) => {
         if (!completed) setShowOnboarding(true);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    check()
+      .then((update) => {
+        if (update) setAvailableUpdate(update);
       })
       .catch(() => {});
   }, []);
@@ -869,6 +922,12 @@ function App() {
 
   return (
     <div className="app">
+      {availableUpdate && (
+        <UpdateBar
+          update={availableUpdate}
+          onDismiss={() => setAvailableUpdate(null)}
+        />
+      )}
       <header className="app-header">
         <div className="header-top">
           <h1>Vulta</h1>

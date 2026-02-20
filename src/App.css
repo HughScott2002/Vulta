@@ -969,3 +969,65 @@ html, body, #root {
   background: var(--primary-dim);
   border-color: var(--primary-dim);
 }
+
+/* ─── Update bar ──────────────────────────────────────────────────── */
+
+.update-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: rgba(50, 204, 42, 0.1);
+  border-bottom: 1px solid var(--primary-muted);
+  animation: update-bar-in 0.3s var(--ease);
+  flex-shrink: 0;
+}
+
+@keyframes update-bar-in {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.update-bar-text {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.update-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.update-bar-btn {
+  padding: 3px 10px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--primary);
+  color: #111;
+  border: none;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: background 0.15s var(--ease);
+}
+
+.update-bar-btn:hover {
+  background: var(--primary-dim);
+}
+
+.update-bar-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s var(--ease);
+}
+
+.update-bar-dismiss:hover {
+  color: var(--text-secondary);
+}
